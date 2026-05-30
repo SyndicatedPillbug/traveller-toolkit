@@ -1,0 +1,23 @@
+{
+  "name": "traveller-toolkit",
+  "version": "0.4.0",
+  "description": "Obsidian sidebar toolkit for Traveller referees with Dossier Engine v4.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "esbuild main.ts --bundle --external:obsidian --format=cjs --target=es2018 --outfile=main.js --sourcemap --watch",
+    "build": "tsc -noEmit -skipLibCheck && esbuild main.ts --bundle --external:obsidian --format=cjs --target=es2018 --outfile=main.js"
+  },
+  "keywords": [
+    "obsidian",
+    "traveller",
+    "ttrpg",
+    "uwp"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "esbuild": "^0.20.2",
+    "obsidian": "latest",
+    "typescript": "^5.4.0"
+  }
+}

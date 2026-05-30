@@ -1,0 +1,16 @@
+{
+  "systemFolder": "Traveller/Systems",
+  "systemIndexFile": "_{name}.md",
+  "createMainworldNote": false,
+  "createSupportNotes": false,
+  "defaultAllegiance": "Independent",
+  "defaultAllegianceCode": "In",
+  "allegianceList": "Independent\nSallowfall Holdings\nCorporate Client\nPort League\nAutocracy\nFrontier Autonomous\nDisputed\nUnclaimed",
+  "defaultNameSeed": "Ardress",
+  "defaultNameStyle": "Frontier Anglo",
+  "defaultStatus": "stub",
+  "defaultProminence": "minor",
+  "createNoteTemplate": true,
+  "subsectorColumns": 10,
+  "subsectorRows": 16
+}

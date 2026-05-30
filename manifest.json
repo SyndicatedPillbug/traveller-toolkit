@@ -1,0 +1,10 @@
+{
+  "id": "traveller-toolkit",
+  "name": "Traveller Toolkit",
+  "version": "4.0.0",
+  "minAppVersion": "1.5.0",
+  "description": "System-first Traveller toolkit with UWP, subsector tools, and Dossier Engine v4 non-AI prose generation.",
+  "author": "Odin + ChatGPT",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}
