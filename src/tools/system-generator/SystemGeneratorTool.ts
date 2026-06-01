@@ -53,6 +53,7 @@ export class SystemGeneratorTool implements TravellerTool {
   label = "System Generator";
   
   private loadedSystem: LoadedSystem | null = null;
+  private containerEl: HTMLElement | null = null;
   private status: SystemStatus = {
     mode: "empty",
     loadedSource: null,
@@ -76,18 +77,29 @@ export class SystemGeneratorTool implements TravellerTool {
     private settingsManager: TravellerToolkitSettingsManager
   ) {}
   
-  render(container: HTMLElement): void {
-    container.empty();
-    container.addClass("ttk-tool-system-generator");
+  render(container?: HTMLElement): void {
+    if (container) {
+      this.containerEl = container;
+    }
+
+    const target = container ?? this.containerEl;
+
+    if (!target) {
+      console.warn("[Traveller Toolkit] SystemGeneratorTool.render called before container was set");
+      return;
+    }
+
+    target.empty();
+    target.addClass("ttk-tool-system-generator");
     
     // Header
-    const header = container.createDiv({ cls: "ttk-tool-header" });
+    const header = target.createDiv({ cls: "ttk-tool-header" });
     header.createEl("h2", { text: "System Generator" });
     
     // ========================================================================
     // CREATE SYSTEM SECTION
     // ========================================================================
-    const createSection = container.createDiv({ cls: "ttk-section" });
+    const createSection = target.createDiv({ cls: "ttk-section" });
     createSection.createEl("h3", { text: "Create New System" });
     
     // Hex input
@@ -129,7 +141,7 @@ export class SystemGeneratorTool implements TravellerTool {
     // ========================================================================
     // LOAD SYSTEM SECTION
     // ========================================================================
-    const loadSection = container.createDiv({ cls: "ttk-section" });
+    const loadSection = target.createDiv({ cls: "ttk-section" });
     loadSection.createEl("h3", { text: "Load Existing System" });
     
     // Hex load
@@ -181,7 +193,7 @@ export class SystemGeneratorTool implements TravellerTool {
     // PROMOTE SECTION (only when system loaded)
     // ========================================================================
     if (this.loadedSystem) {
-      const promoteSection = container.createDiv({ cls: "ttk-section" });
+      const promoteSection = target.createDiv({ cls: "ttk-section" });
       promoteSection.createEl("h3", { text: "Promote System" });
       
       const promoteButton = promoteSection.createEl("button", {
@@ -196,7 +208,7 @@ export class SystemGeneratorTool implements TravellerTool {
     // ========================================================================
     // DEBUG PANEL - ALWAYS VISIBLE
     // ========================================================================
-    const debugPanel = container.createDiv({ cls: "ttk-debug-panel" });
+    const debugPanel = target.createDiv({ cls: "ttk-debug-panel" });
     debugPanel.createEl("h3", { 
       text: "🐛 Debug: Loaded System State",
       cls: "ttk-debug-title"
@@ -206,14 +218,14 @@ export class SystemGeneratorTool implements TravellerTool {
     // ========================================================================
     // STATUS
     // ========================================================================
-    const statusDiv = container.createDiv({ cls: "ttk-status" });
+    const statusDiv = target.createDiv({ cls: "ttk-status" });
     this.renderStatus(statusDiv);
     
     // ========================================================================
     // LOADED SYSTEM INFO (when loaded)
     // ========================================================================
     if (this.loadedSystem) {
-      this.renderLoadedSystemInfo(container);
+      this.renderLoadedSystemInfo(target);
     }
   }
   
@@ -764,8 +776,10 @@ New Traveller system.
   }
   
   onUnload(): void {
-    this.loadedSystem = null;
+    this.containerEl = null;
     this.hexInput = null;
     this.nameInput = null;
+    // It is acceptable to clear loadedSystem only when leaving the tool.
+    // Do not call onUnload during normal refreshes.
   }
 }
