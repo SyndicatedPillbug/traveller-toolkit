@@ -1,442 +1,515 @@
-.traveller-toolkit-view {
+/**
+ * Traveller Toolkit - Scoped CSS
+ * All styles prefixed with .ttk- to avoid Obsidian theme collisions
+ */
+
+/* Root container */
+.ttk-root {
   padding: 12px;
-  --tt-panel: var(--background-secondary);
-  --tt-line: var(--background-modifier-border);
-  --tt-accent: var(--interactive-accent);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-.tt-header {
-  margin-bottom: 12px;
+/* Header */
+.ttk-header {
+  margin-bottom: 16px;
 }
 
-.tt-title {
-  margin: 0;
+.ttk-title {
+  margin: 0 0 4px 0;
   font-size: 1.25rem;
   font-weight: 800;
 }
 
-.tt-subtitle {
+.ttk-subtitle {
   color: var(--text-muted);
   font-size: 0.85rem;
-  margin-top: 4px;
+  margin: 0;
 }
 
-.tt-card {
-  border: 1px solid var(--tt-line);
-  border-radius: 12px;
-  padding: 10px;
-  background: var(--tt-panel);
-  margin-bottom: 10px;
+/* Navigation */
+.ttk-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
-.tt-card h3 {
-  margin: 0 0 8px;
+.ttk-nav-button {
+  padding: 6px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.ttk-nav-button:hover {
+  background: var(--background-modifier-hover);
+}
+
+.ttk-nav-button.active {
+  background: var(--interactive-accent);
+  color: white;
+  border-color: var(--interactive-accent);
+}
+
+.ttk-nav-icon {
+  font-size: 1rem;
+}
+
+/* Content area */
+.ttk-content {
+  margin-top: 8px;
+}
+
+/* Home screen */
+.ttk-home {
+  display: grid;
+  gap: 12px;
+}
+
+.ttk-home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.ttk-home-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--background-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ttk-home-card:hover {
+  background: var(--background-modifier-hover);
+}
+
+.ttk-home-card-clickable {
+  cursor: pointer;
+}
+
+.ttk-home-card-placeholder {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.ttk-home-card-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.ttk-home-card-header {
+  margin-bottom: 4px;
+}
+
+.ttk-home-card-header h3 {
+  margin: 0;
   font-size: 0.95rem;
 }
 
-.tt-row {
+.ttk-home-card-description {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.ttk-home-card-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--background-modifier-border);
+  color: var(--text-normal);
+  font-size: 0.7rem;
+  margin-top: 8px;
+}
+
+/* Status card */
+.ttk-status-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--background-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+.ttk-status-card .ttk-status-line {
+  margin: 4px 0;
+  color: var(--text-muted);
+}
+
+.ttk-status-card .ttk-status-error {
+  color: var(--text-error);
+}
+
+/* Field rows */
+.ttk-field-row {
   display: grid;
-  grid-template-columns: 110px minmax(0, 1fr);
+  grid-template-columns: 120px minmax(0, 1fr);
   gap: 8px;
   align-items: center;
   margin-bottom: 8px;
 }
 
-.tt-row label,
-.tt-check label {
+.ttk-field-row label {
   font-size: 0.82rem;
   font-weight: 650;
   color: var(--text-normal);
 }
 
-.tt-row input,
-.tt-row select,
-.tt-output textarea {
-  width: 100%;
-}
-
-.tt-check {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin: 6px 0;
-}
-
-.tt-button-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.tt-button-row button {
-  flex: 1 1 auto;
-}
-
-.tt-uwp-display {
-  font-family: var(--font-monospace);
-  font-size: 2rem;
-  line-height: 1.1;
-  font-weight: 900;
-  letter-spacing: -0.06em;
-  padding: 12px;
-  border-radius: 12px;
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.tt-bases {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-}
-
-.tt-base-option {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  font-size: 0.82rem;
-}
-
-.tt-output textarea {
-  min-height: 72px;
-  font-family: var(--font-monospace);
-  font-size: 0.82rem;
-}
-
-.tt-breakdown {
-  white-space: pre-wrap;
-  font-family: var(--font-text);
+.ttk-field-row input,
+.ttk-field-row select {
+  padding: 4px 6px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
   font-size: 0.85rem;
-  line-height: 1.35;
-  border: 1px solid var(--tt-line);
-  border-radius: 8px;
-  padding: 8px;
-  background: var(--background-primary);
+  width: 100%;
 }
 
-.tt-details {
-  border: 1px solid var(--tt-line);
-  border-radius: 10px;
-  padding: 8px;
-  margin: 8px 0;
+.ttk-field-row input:focus,
+.ttk-field-row select:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
 }
 
-.tt-details summary {
+/* Big buttons */
+.ttk-big-button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
   cursor: pointer;
-  font-weight: 800;
-}
-
-.tt-note {
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  line-height: 1.35;
-  margin-top: 8px;
-}
-
-/* UX refresh: tool navigation, beginner-friendly cards, and large action buttons */
-.tt-tool-nav {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
-  margin: 10px 0 12px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  padding: 6px 0;
-  background: var(--background-primary);
-}
-
-.tt-nav-button {
-  border-radius: 10px;
-  padding: 8px 6px;
-  font-weight: 750;
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary);
-  color: var(--text-normal);
-}
-
-.tt-nav-button.is-active {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-color: var(--interactive-accent);
-}
-
-.tt-help {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  line-height: 1.35;
-  margin: -2px 0 10px;
-}
-
-.tt-quick-actions,
-.tt-tool-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-}
-
-.tt-big-button {
-  width: 100%;
+  font-size: 0.9rem;
   text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-primary);
-  color: var(--text-normal);
-  box-shadow: none;
-}
-
-.tt-big-button.is-primary {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-color: var(--interactive-accent);
-}
-
-.tt-big-button-title {
-  font-weight: 850;
-  font-size: 0.92rem;
-}
-
-.tt-big-button-desc {
-  font-size: 0.76rem;
-  line-height: 1.25;
-  opacity: 0.85;
-}
-
-.tt-tool-section {
-  animation: ttFadeIn 120ms ease-out;
-}
-
-@keyframes ttFadeIn {
-  from { opacity: 0; transform: translateY(3px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.tt-row:hover,
-.tt-check:hover {
-  background: var(--background-primary);
-  border-radius: 8px;
-}
-
-.tt-row label[title]::after {
-  content: " ?";
-  color: var(--text-muted);
-  font-weight: 800;
-}
-
-.tt-details {
-  background: var(--background-primary);
-}
-
-.tt-details summary {
-  padding: 2px 0;
-}
-
-.tt-output textarea {
-  max-height: 280px;
-}
-
-@media (min-width: 420px) {
-  .tt-tool-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-
-/* Narrow-sidebar rescue pass: Obsidian sidebars can be very small, and theme button
-   rules often force nowrap/inline-flex. These overrides keep the toolkit usable. */
-.traveller-toolkit-view {
-  padding: 10px;
-  overflow-x: hidden;
-  max-width: 100%;
-}
-
-.traveller-toolkit-view *,
-.traveller-toolkit-view *::before,
-.traveller-toolkit-view *::after {
-  box-sizing: border-box;
-  min-width: 0;
-}
-
-.tt-title {
-  font-size: 1.15rem !important;
-  line-height: 1.15 !important;
-  margin: 0 0 4px !important;
-  overflow-wrap: anywhere;
-}
-
-.tt-subtitle,
-.tt-help,
-.tt-note {
-  overflow-wrap: anywhere;
-}
-
-.tt-tool-nav {
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: 4px !important;
-  margin: 8px 0 10px !important;
-  padding: 6px 0 !important;
-  overflow: visible !important;
-}
-
-.tt-nav-button {
-  width: 100% !important;
-  min-width: 0 !important;
-  height: auto !important;
-  min-height: 34px !important;
-  padding: 6px 4px !important;
-  font-size: 0.72rem !important;
-  line-height: 1.1 !important;
-  white-space: normal !important;
-  overflow-wrap: anywhere !important;
-  text-align: center !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.tt-card {
-  overflow: hidden;
-}
-
-.tt-big-button {
-  width: 100% !important;
-  min-width: 0 !important;
-  height: auto !important;
-  min-height: 0 !important;
-  white-space: normal !important;
-  text-align: left !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  justify-content: flex-start !important;
-  gap: 4px !important;
-  padding: 10px 12px !important;
-  overflow: hidden !important;
-}
-
-.tt-big-button-title,
-.tt-big-button-desc {
-  display: block !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  white-space: normal !important;
-  overflow-wrap: anywhere !important;
-  text-align: left !important;
-  line-height: 1.25 !important;
-}
-
-.tt-big-button-title {
-  font-size: 0.9rem !important;
-}
-
-.tt-big-button-desc {
-  font-size: 0.74rem !important;
-}
-
-.tt-button-row button {
-  min-width: 0 !important;
-  white-space: normal !important;
-  overflow-wrap: anywhere !important;
-  height: auto !important;
-}
-
-.tt-row {
-  grid-template-columns: minmax(90px, 36%) minmax(0, 1fr) !important;
-}
-
-.tt-row input,
-.tt-row select,
-.tt-output textarea,
-.tt-output input,
-.tt-output select {
-  max-width: 100%;
-  min-width: 0;
-}
-
-.tt-uwp-display {
-  font-size: clamp(1.45rem, 10vw, 2rem) !important;
-  letter-spacing: -0.04em !important;
-  overflow-wrap: anywhere;
-}
-
-@media (max-width: 330px) {
-  .tt-tool-nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-  .tt-row {
-    grid-template-columns: 1fr !important;
-    gap: 4px !important;
-  }
-  .tt-bases {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* Generation controls and load/status UX */
-.traveller-toolkit-view .tt-range-wrap {
-  display: grid;
-  grid-template-columns: minmax(90px, 1fr) 2.5rem;
-  gap: 0.5rem;
-  align-items: center;
-  min-width: 0;
-}
-.traveller-toolkit-view input[type="range"] {
-  width: 100%;
-  min-width: 0;
-}
-.traveller-toolkit-view .tt-range-value {
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  color: var(--text-muted);
-  font-size: var(--font-ui-smaller);
-}
-.traveller-toolkit-view .tt-status-box {
-  margin-top: 0.75rem;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 10px;
-  background: var(--background-secondary);
-  color: var(--text-muted);
-  font-size: var(--font-ui-small);
-  line-height: 1.35;
-}
-
-
-/* Hex command bar */
-.traveller-toolkit-view .tt-hex-command-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-}
-.traveller-toolkit-view .tt-hex-command-box {
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 12px;
-  padding: 10px;
-  background: var(--background-secondary);
-}
-.traveller-toolkit-view .tt-mini-heading {
-  font-weight: 700;
-  font-size: 0.9em;
-  margin-bottom: 6px;
-  color: var(--text-normal);
-}
-.traveller-toolkit-view .tt-wide-button {
-  width: 100%;
-  min-height: 40px;
+  margin-bottom: 8px;
   white-space: normal;
   overflow-wrap: anywhere;
-  text-align: left;
-  justify-content: flex-start;
-  margin-top: 4px;
 }
-@container (min-width: 520px) {
-  .traveller-toolkit-view .tt-hex-command-grid {
-    grid-template-columns: 1fr 1fr;
+
+.ttk-big-button:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+}
+
+.ttk-big-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Section */
+.ttk-section {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--background-secondary);
+  margin-bottom: 12px;
+}
+
+.ttk-section-title {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* Slider rows */
+.ttk-slider-row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 40px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ttk-slider-row label {
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--text-normal);
+}
+
+.ttk-slider-row input[type="range"] {
+  grid-column: 2;
+  width: 100%;
+}
+
+.ttk-slider-row .ttk-slider-value {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: right;
+  min-width: 30px;
+}
+
+/* Two column layout */
+.ttk-two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 400px) {
+  .ttk-two-column {
+    grid-template-columns: 1fr;
   }
+}
+
+/* Scroll area */
+.ttk-scroll-area {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+  padding: 8px;
+}
+
+/* Debug styles */
+.ttk-debug {
+  font-family: var(--font-monospace);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 8px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Danger text */
+.ttk-danger {
+  color: var(--text-error);
+}
+
+/* Muted text */
+.ttk-muted {
+  color: var(--text-muted);
+}
+
+/* Tool header */
+.ttk-tool-header {
+  margin-bottom: 16px;
+}
+
+.ttk-tool-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* Rows */
+.ttk-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ttk-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-normal);
+  min-width: 60px;
+}
+
+/* Input fields */
+.ttk-input {
+  padding: 4px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: 0.85rem;
+  flex: 1;
+  min-width: 100px;
+}
+
+.ttk-input:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+}
+
+.ttk-input-hex {
+  width: 80px;
+}
+
+/* Buttons */
+.ttk-button {
+  padding: 6px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.ttk-button:hover {
+  background: var(--background-modifier-hover);
+}
+
+.ttk-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ttk-button-primary {
+  background: var(--interactive-accent);
+  color: white;
+  border-color: var(--interactive-accent);
+}
+
+.ttk-button-primary:hover {
+  background: var(--interactive-accent-hover);
+  border-color: var(--interactive-accent-hover);
+}
+
+.ttk-button-create {
+  background: var(--background-modifier-success);
+  color: white;
+  border-color: var(--background-modifier-success);
+}
+
+.ttk-button-promote {
+  background: var(--background-modifier-success);
+  color: white;
+  border-color: var(--background-modifier-success);
+}
+
+/* Status */
+.ttk-status {
+  margin: 12px 0;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.ttk-status-text {
+  margin: 0;
+}
+
+.ttk-status-ok {
+  color: var(--text-success);
+}
+
+.ttk-status-error {
+  color: var(--text-error);
+}
+
+/* Debug panel */
+.ttk-debug-panel {
+  margin-top: 16px;
+  padding: 12px;
+  border: 2px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  font-size: 0.75rem;
+}
+
+.ttk-debug-title {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-warning);
+}
+
+.ttk-debug-row {
+  display: flex;
+  margin: 2px 0;
+}
+
+.ttk-debug-label {
+  color: var(--text-muted);
+  min-width: 120px;
+  font-weight: 600;
+}
+
+.ttk-debug-value {
+  color: var(--text-normal);
+  word-break: break-all;
+}
+
+.ttk-debug-important {
+  color: var(--text-warning);
+  font-weight: 700;
+}
+
+.ttk-debug-subtitle {
+  margin: 8px 0 4px 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.ttk-debug-note {
+  margin: 4px 0;
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.75rem;
+}
+
+/* Info list */
+.ttk-info-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.85rem;
+}
+
+.ttk-info-item {
+  margin: 4px 0;
+}
+
+.ttk-info-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.ttk-info-value {
+  color: var(--text-normal);
+}
+
+/* System info */
+.ttk-system-info {
+  margin-top: 12px;
+}
+
+/* Support items */
+.ttk-support-item {
+  margin: 4px 0;
+  font-size: 0.85rem;
+}
+
+.ttk-status-exists {
+  color: var(--text-success);
+}
+
+.ttk-status-missing {
+  color: var(--text-error);
+}
+
+/* System list */
+.ttk-system-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.ttk-system-list-item {
+  margin: 4px 0;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ttk-system-list-item:hover {
+  background: var(--background-modifier-hover);
 }

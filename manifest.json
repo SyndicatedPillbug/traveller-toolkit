@@ -1,10 +1,9 @@
 {
   "id": "traveller-toolkit",
   "name": "Traveller Toolkit",
-  "version": "4.0.0",
+  "version": "0.3.0",
   "minAppVersion": "1.5.0",
-  "description": "System-first Traveller toolkit with UWP, subsector tools, and Dossier Engine v4 non-AI prose generation.",
-  "author": "Odin + ChatGPT",
-  "authorUrl": "",
+  "description": "Traveller campaign tools for systems, journals, characters, and procedural referee prep.",
+  "author": "Odin",
   "isDesktopOnly": false
 }

@@ -1,18 +1,19 @@
 {
   "name": "traveller-toolkit",
-  "version": "0.4.0",
-  "description": "Obsidian sidebar toolkit for Traveller referees with Dossier Engine v4.",
+  "version": "0.3.0",
+  "description": "Traveller campaign tools for Obsidian",
   "main": "main.js",
   "scripts": {
     "dev": "esbuild main.ts --bundle --external:obsidian --format=cjs --target=es2018 --outfile=main.js --sourcemap --watch",
-    "build": "tsc -noEmit -skipLibCheck && esbuild main.ts --bundle --external:obsidian --format=cjs --target=es2018 --outfile=main.js"
+    "build": "tsc -noEmit -skipLibCheck && esbuild main.ts --bundle --external:obsidian --format=cjs --target=es2018 --outfile=main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "obsidian",
     "traveller",
-    "ttrpg",
-    "uwp"
+    "ttrpg"
   ],
+  "author": "Odin",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.11.30",
