@@ -111,7 +111,7 @@ export class HomeTool implements TravellerTool {
 **Skeleton implementation**:
 ```typescript
 import { TravellerTool } from "../registry";
-import { TravellerToolkitPlugin } from "../../app/TravellerToolkitPlugin";
+import TravellerToolkitPlugin from "../../app/TravellerToolkitPlugin";
 import { TravellerToolkitServices } from "../../vault/services";
 import { TravellerToolkitSettingsManager } from "../../app/settings";
 import { LoadedSystem } from "../../app/types";

@@ -3,6 +3,56 @@ import { VaultService } from "./VaultService";
 import { LinkService } from "./LinkService";
 import { LoadedSystem } from "../app/types";
 
+// ==========================================================================
+// Helper functions for hex and system matching
+// ==========================================================================
+
+/**
+ * Normalize a hex value to a 4-digit string.
+ * Trims, removes non-digits, pads with leading zeros.
+ */
+function normalizeHex(value: unknown): string {
+  const digits = String(value ?? "")
+    .trim()
+    .replace(/[^0-9]/g, "");
+
+  if (!digits) return "";
+
+  return digits.padStart(4, "0").slice(-4);
+}
+
+/**
+ * Check if frontmatter indicates a system note.
+ */
+function isSystemFrontmatter(fm: any): boolean {
+  const type = String(fm?.type ?? fm?.record_type ?? "")
+    .trim()
+    .toLowerCase();
+
+  return (
+    type === "system" ||
+    type === "traveller_system" ||
+    String(fm?.record_type ?? "").trim().toLowerCase() === "system"
+  );
+}
+
+/**
+ * Parse a system folder path to extract hex and name.
+ * e.g., "Traveller/Systems/0301 - Milice/_Milice.md" -> { hex: "0301", name: "Milice" }
+ */
+function parseSystemFolderNameFromPath(path: string): { hex: string; name: string } | null {
+  const parts = String(path || "").split("/");
+  const folderName = parts[parts.length - 2] ?? "";
+  const match = folderName.match(/^(\d{4})\s*-\s*(.+)$/);
+
+  if (!match) return null;
+
+  return {
+    hex: match[1],
+    name: match[2],
+  };
+}
+
 export interface SystemRecord {
   file: TFile;
   path: string;
@@ -41,52 +91,91 @@ export class FileDiscoveryService {
   }
 
   /**
-   * Find a system file by hex code
-   * Uses metadata-first search: frontmatter hex match, then folder name pattern
+   * Find a system file by hex code.
+   *
+   * This must be path-resilient. It scans all markdown files and does not assume
+   * the system still lives under the configured settings folder.
    */
   async findSystemByHex(hex: string): Promise<TFile | null> {
-    const normalizedHex = String(hex).padStart(4, "0");
+    const normalizedHex = normalizeHex(hex);
     const files = this.vault.getAllMarkdownFiles();
 
-    // 1. Prefer explicit system frontmatter match
+    console.log("[Traveller Toolkit] findSystemByHex:start", {
+      input: hex,
+      normalizedHex,
+      markdownFileCount: files.length,
+    });
+
+    if (!normalizedHex || !/^\d{4}$/.test(normalizedHex)) {
+      console.warn("[Traveller Toolkit] findSystemByHex:invalid hex", {
+        input: hex,
+        normalizedHex,
+      });
+      return null;
+    }
+
+    // 1. Prefer explicit system frontmatter match.
     for (const file of files) {
       const cache = this.app.metadataCache.getFileCache(file);
       const fm = cache?.frontmatter;
       if (!fm) continue;
 
-      const type = String(fm.type ?? fm.record_type ?? "").toLowerCase();
-      const fmHex = String(fm.hex ?? fm.system_hex ?? "").trim();
+      const fmHex = normalizeHex(fm.hex ?? fm.system_hex ?? "");
 
-      if (
-        fmHex === normalizedHex &&
-        (type === "system" || type === "traveller_system" || fm.record_type === "system")
-      ) {
+      if (fmHex === normalizedHex && isSystemFrontmatter(fm)) {
+        console.log("[Traveller Toolkit] findSystemByHex:matched frontmatter", {
+          path: file.path,
+          fmHex,
+          type: fm.type,
+          record_type: fm.record_type,
+        });
         return file;
       }
     }
 
-    // 2. Fallback: folder name matches hex pattern "0301 - Name"
+    // 2. Fallback: any underscore markdown file in a folder named "0301 - Name".
+    // This catches _Milice.md even if frontmatter is stale, missing, or not yet indexed.
     for (const file of files) {
-      const parts = file.path.split("/");
-      const folderName = parts[parts.length - 2] ?? "";
-      
-      if (folderName.startsWith(`${normalizedHex} - `) && file.basename.startsWith("_")) {
+      const folderInfo = parseSystemFolderNameFromPath(file.path);
+      if (!folderInfo) continue;
+
+      if (folderInfo.hex === normalizedHex && file.basename.startsWith("_")) {
+        console.log("[Traveller Toolkit] findSystemByHex:matched folder/index pattern", {
+          path: file.path,
+          folderInfo,
+          basename: file.basename,
+        });
         return file;
       }
     }
 
-    // 3. Legacy: _System.md in folder named "HEX - Name"
+    // 3. Legacy fallback: old _System.md convention.
+    // Note: TFile.basename does NOT include ".md".
     for (const file of files) {
-      if (file.basename === "_System.md" || file.basename === "_system.md") {
-        const parts = file.path.split("/");
-        const folderName = parts[parts.length - 2] ?? "";
-        const folderHex = folderName.match(/^(\d{4})\s*-/)?.[1];
-        
-        if (folderHex === normalizedHex) {
-          return file;
-        }
+      const folderInfo = parseSystemFolderNameFromPath(file.path);
+      if (!folderInfo) continue;
+
+      const basename = String(file.basename || "").toLowerCase();
+
+      if (folderInfo.hex === normalizedHex && (basename === "_system" || basename.startsWith("_"))) {
+        console.log("[Traveller Toolkit] findSystemByHex:matched legacy fallback", {
+          path: file.path,
+          folderInfo,
+          basename: file.basename,
+        });
+        return file;
       }
     }
+
+    console.warn("[Traveller Toolkit] findSystemByHex:not found", {
+      input: hex,
+      normalizedHex,
+      scannedFiles: files.length,
+      candidateSystemFolders: files
+        .map((f) => ({ path: f.path, folderInfo: parseSystemFolderNameFromPath(f.path), basename: f.basename }))
+        .filter((x) => x.folderInfo)
+        .slice(0, 25),
+    });
 
     return null;
   }
@@ -99,8 +188,7 @@ export class FileDiscoveryService {
     const fm = cache?.frontmatter || {};
 
     // If it's already a system note
-    const type = String(fm.type ?? fm.record_type ?? "").toLowerCase();
-    if (type === "system" || type === "traveller_system") {
+    if (isSystemFrontmatter(fm)) {
       return file;
     }
 
@@ -115,7 +203,7 @@ export class FileDiscoveryService {
 
     // Try system_hex reference
     if (fm.system_hex || fm.hex) {
-      const hex = String(fm.system_hex || fm.hex).trim();
+      const hex = normalizeHex(fm.system_hex || fm.hex);
       if (hex) {
         const systemFile = await this.findSystemByHex(hex);
         if (systemFile) return systemFile;
@@ -128,17 +216,22 @@ export class FileDiscoveryService {
       .getAllMarkdownFiles()
       .filter((f) => this.vault.getParentFolder(f.path) === parentFolder);
 
+    // Prefer a system-marked underscore note in the same folder.
     for (const parentFile of parentFiles) {
-      if (parentFile.basename.startsWith("_")) {
-        const parentCache = this.app.metadataCache.getFileCache(parentFile);
-        const parentFm = parentCache?.frontmatter || {};
-        const parentType = String(parentFm.type ?? parentFm.record_type ?? "").toLowerCase();
-        
-        if (parentType === "system" || parentType === "traveller_system") {
-          return parentFile;
-        }
+      if (!parentFile.basename.startsWith("_")) continue;
+
+      const parentCache = this.app.metadataCache.getFileCache(parentFile);
+      const parentFm = parentCache?.frontmatter || {};
+
+      if (isSystemFrontmatter(parentFm)) {
+        return parentFile;
       }
     }
+
+    // If no frontmatter-marked system file is found, fall back to the first underscore note.
+    // This handles moved folders and stale metadata.
+    const underscoreIndex = parentFiles.find((f) => f.basename.startsWith("_"));
+    if (underscoreIndex) return underscoreIndex;
 
     return null;
   }
@@ -153,18 +246,17 @@ export class FileDiscoveryService {
     for (const file of files) {
       const cache = this.app.metadataCache.getFileCache(file);
       const fm = cache?.frontmatter || {};
-      const folderInfo = this.parseSystemFolderPath(file.path);
+      const folderInfo = parseSystemFolderNameFromPath(file.path);
 
       const type = String(fm.type ?? fm.record_type ?? "").toLowerCase();
-      const hex = String(fm.hex ?? fm.system_hex ?? folderInfo?.hex ?? "").trim();
+      const hex = normalizeHex(fm.hex ?? fm.system_hex ?? folderInfo?.hex ?? "");
 
       // Check if this is a system note
       const isSystem = 
-        type === "system" || 
-        type === "traveller_system" ||
+        isSystemFrontmatter(fm) ||
         (folderInfo && file.basename.startsWith("_"));
 
-      if (isSystem && hex && /^[0-9]{4}$/.test(hex)) {
+      if (isSystem && hex && /^\d{4}$/.test(hex)) {
         const folder = this.vault.getParentFolder(file.path);
         
         systems.push({
@@ -215,6 +307,8 @@ export class FileDiscoveryService {
   /**
    * Parse folder path to extract system info
    * e.g., "Traveller/Systems/0301 - Milice/_Milice.md" -> { hex: "0301", name: "Milice" }
+   * 
+   * @deprecated Use parseSystemFolderNameFromPath instead
    */
   private parseSystemFolderPath(path: string): { hex?: string; name?: string } | null {
     const parts = path.split("/");

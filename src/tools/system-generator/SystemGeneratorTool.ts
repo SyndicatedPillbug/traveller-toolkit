@@ -6,6 +6,35 @@ import { TravellerToolkitSettingsManager } from "../../app/settings";
 import { LoadedSystem, SystemStatus } from "../../app/types";
 import { SUPPORT_NOTES } from "../../app/constants";
 
+// ==========================================================================
+// Helper functions
+// ==========================================================================
+
+/**
+ * Normalize a hex value to a 4-digit string.
+ * Trims, removes non-digits, pads with leading zeros.
+ */
+function normalizeHex(value: unknown): string {
+  const digits = String(value ?? "")
+    .trim()
+    .replace(/[^0-9]/g, "");
+
+  if (!digits) return "";
+
+  return digits.padStart(4, "0").slice(-4);
+}
+
+/**
+ * Normalize a system name for use in file names.
+ * Removes leading underscore, strips trailing "System" suffix, trims.
+ */
+function normalizeSystemName(value: unknown): string {
+  return String(value ?? "")
+    .replace(/^_/, "")
+    .replace(/\s+System$/i, "")
+    .trim();
+}
+
 /**
  * SystemGeneratorTool - Minimal vertical slice implementation
  * 
@@ -123,6 +152,19 @@ export class SystemGeneratorTool implements TravellerTool {
       if (hex) {
         await this.loadHex(hex);
       }
+    });
+    
+    // Debug Find Hex button
+    const debugFindButton = loadHexRow.createEl("button", {
+      text: "Debug Find Hex",
+      cls: "ttk-button ttk-button-debug",
+    });
+    debugFindButton.addEventListener("click", async () => {
+      const hex = normalizeHex(loadHexInput.value.trim());
+      console.log("[Traveller Toolkit] Debug Find Hex clicked", { hex });
+      const file = await this.services.discovery.findSystemByHex(hex);
+      console.log("[Traveller Toolkit] Debug Find Hex result", file?.path ?? null);
+      new Notice(file ? `Found: ${file.path}` : `No system found for ${hex}`);
     });
     
     // Load active note button
@@ -318,7 +360,17 @@ export class SystemGeneratorTool implements TravellerTool {
     this.render();
     
     try {
-      const normalizedHex = String(hex).padStart(4, "0").toUpperCase();
+      const normalizedHex = normalizeHex(hex);
+      if (!normalizedHex || !/^\d{4}$/.test(normalizedHex)) {
+        this.updateStatus({ 
+          lastAction: "create", 
+          lastError: `"${hex}" is not a valid hex. Use 4 hex digits like 0301.`
+        });
+        new Notice("Traveller Toolkit: Enter a valid hex, such as 0301");
+        this.render();
+        return;
+      }
+      
       const folderName = `${normalizedHex} - ${name}`;
       const settings = this.settingsManager.get();
       const baseFolder = settings.systemsFolder || "Traveller/Systems";
@@ -331,9 +383,10 @@ export class SystemGeneratorTool implements TravellerTool {
       if (existingSystem) {
         this.updateStatus({ 
           lastAction: "create", 
-          lastError: `System with hex ${normalizedHex} already exists` 
+          lastError: `System with hex ${normalizedHex} already exists at ${existingSystem.path}` 
         });
         new Notice(`Traveller Toolkit: System ${normalizedHex} already exists`);
+        this.render();
         return;
       }
       
@@ -341,7 +394,7 @@ export class SystemGeneratorTool implements TravellerTool {
       await this.services.vault.ensureFolder(folderPath);
       
       // Create system note
-      const systemContent = this.getDefaultSystemContent(hex, name);
+      const systemContent = this.getDefaultSystemContent(normalizedHex, name);
       const systemFile = await this.services.vault.createFile(systemNotePath, systemContent);
       
       // Create LoadedSystem
@@ -354,7 +407,7 @@ export class SystemGeneratorTool implements TravellerTool {
         systemFile,
         systemFolder: folderPath,
         hex: normalizedHex,
-        name,
+        name: normalizeSystemName(name),
         systemNotePath: systemFile.path,
         mainworldPath,
         supportPaths,
@@ -362,7 +415,8 @@ export class SystemGeneratorTool implements TravellerTool {
         frontmatter: {
           type: "system",
           hex: normalizedHex,
-          name: name,
+          name: normalizeSystemName(name),
+          mainworld: normalizeSystemName(name),
         },
       };
       
@@ -394,6 +448,7 @@ export class SystemGeneratorTool implements TravellerTool {
         lastAction: "create", 
         lastError: `Failed to create: ${err}` 
       });
+      this.render();
       new Notice("Traveller Toolkit: Create failed - see console for details");
     }
   }
@@ -406,7 +461,7 @@ export class SystemGeneratorTool implements TravellerTool {
 type: system
 hex: "${hex}"
 name: "${name}"
-mainworld: "${name}"
+mainworld: "${normalizeSystemName(name)}"
 status: draft
 prep_status: draft
 ---
@@ -432,14 +487,31 @@ New Traveller system.
     this.render();
     
     try {
-      const normalizedHex = String(hex).padStart(4, "0").toUpperCase();
+      const normalizedHex = normalizeHex(hex);
+
+      console.log("[Traveller Toolkit] loadHex", {
+        input: hex,
+        normalizedHex,
+      });
+
+      if (!normalizedHex) {
+        this.updateStatus({ 
+          lastAction: "load-hex", 
+          lastError: "Enter a valid hex, such as 0301"
+        });
+        new Notice("Traveller Toolkit: Enter a valid hex, such as 0301");
+        this.render();
+        return;
+      }
+      
       const systemFile = await this.services.discovery.findSystemByHex(normalizedHex);
       
       if (!systemFile) {
         this.updateStatus({ 
           lastAction: "load-hex", 
-          lastError: `System with hex ${normalizedHex} not found` 
+          lastError: `System with hex ${normalizedHex} not found. Checked frontmatter and folder names across the vault.` 
         });
+        this.render();
         new Notice(`Traveller Toolkit: System with hex ${normalizedHex} not found`);
         return;
       }
@@ -452,6 +524,7 @@ New Traveller system.
         lastAction: "load-hex", 
         lastError: `Failed to load: ${err}` 
       });
+      this.render();
       new Notice("Traveller Toolkit: Failed to load system - see console");
     }
   }
@@ -472,6 +545,7 @@ New Traveller system.
           lastError: "No active file" 
         });
         new Notice("Traveller Toolkit: No active file");
+        this.render();
         return;
       }
       
@@ -483,13 +557,13 @@ New Traveller system.
           lastError: "No system found for active note" 
         });
         new Notice("Traveller Toolkit: No system found for active note");
+        this.render();
         return;
       }
       
       // Get hex from frontmatter
-      const hex = this.services.frontmatter.getFrontmatterValue<string>(systemFile, "hex")
-        ?? this.services.frontmatter.getFrontmatterValue<string>(systemFile, "system_hex")
-        ?? "";
+      const fm = this.services.frontmatter.getFrontmatter(systemFile);
+      const hex = normalizeHex(fm?.hex ?? fm?.system_hex ?? "");
       
       await this.loadSystem(systemFile, "active-note", hex);
       
@@ -499,6 +573,7 @@ New Traveller system.
         lastAction: "load-active", 
         lastError: `Failed to load: ${err}` 
       });
+      this.render();
       new Notice("Traveller Toolkit: Failed to load from active note - see console");
     }
   }
@@ -512,10 +587,16 @@ New Traveller system.
     hex: string
   ): Promise<void> {
     const folder = this.services.vault.getParentFolder(systemFile.path);
-    const name = this.services.frontmatter.getFrontmatterValue<string>(systemFile, "name")
-      ?? systemFile.basename.replace(/^_/, "");
     
-    const normalizedHex = String(hex).padStart(4, "0").toUpperCase();
+    const fm = this.services.frontmatter.getFrontmatter(systemFile) || {};
+    
+    const rawName =
+      this.services.frontmatter.getFrontmatterValue<string>(systemFile, "mainworld") ??
+      this.services.frontmatter.getFrontmatterValue<string>(systemFile, "name") ??
+      systemFile.basename.replace(/^_/, "");
+
+    const name = normalizeSystemName(rawName) || normalizeSystemName(systemFile.basename) || "Unnamed";
+    const normalizedHex = normalizeHex(hex || (fm as any).hex || (fm as any).system_hex);
     
     const supportPaths: Record<string, string> = {};
     for (const note of SUPPORT_NOTES) {
@@ -531,7 +612,7 @@ New Traveller system.
       mainworldPath: `${folder}/${name}.md`,
       supportPaths,
       source,
-      frontmatter: this.services.frontmatter.getFrontmatter(systemFile),
+      frontmatter: fm,
     };
     
     // Check which files exist
@@ -579,7 +660,6 @@ New Traveller system.
     try {
       // CRITICAL: Use loadedSystem.systemFolder, NOT settings.systemsFolder
       const folder = this.loadedSystem.systemFolder;
-      const settings = this.settingsManager.get();
       
       console.log(`[Traveller Toolkit Promote] Using folder: ${folder}`);
       console.log(`[Traveller Toolkit Promote] System file: ${this.loadedSystem.systemFile.path}`);
@@ -613,22 +693,30 @@ New Traveller system.
           path,
           this.getDefaultSupportContent(id)
         );
+
         if (wasCreated) {
-          console.log(`[Traveller Toolkit] Created ${path}`);
-          this.status.supportTargets[id] = true;
+          console.log(`[Traveller Toolkit] Created support note: ${path}`);
+        } else {
+          console.log(`[Traveller Toolkit] Support note already exists: ${path}`);
         }
+
+        this.status.supportTargets[id] = true;
       }
       
       // Create mainworld if missing - ALWAYS create if missing
       // Existing mainworld is preserved (createFileIfMissing won't overwrite)
-      const { wasCreated } = await this.services.safeWrite.createFileIfMissing(
+      const { wasCreated: mainworldWasCreated } = await this.services.safeWrite.createFileIfMissing(
         this.loadedSystem.mainworldPath,
         this.getDefaultMainworldContent()
       );
-      if (wasCreated) {
-        console.log(`[Traveller Toolkit] Created ${this.loadedSystem.mainworldPath}`);
-        this.status.mainworldExists = true;
+
+      if (mainworldWasCreated) {
+        console.log(`[Traveller Toolkit] Created mainworld note: ${this.loadedSystem.mainworldPath}`);
+      } else {
+        console.log(`[Traveller Toolkit] Mainworld note already exists: ${this.loadedSystem.mainworldPath}`);
       }
+
+      this.status.mainworldExists = true;
       
       this.status.mode = "promoted";
       this.status.lastAction = "promoted";
@@ -642,6 +730,7 @@ New Traveller system.
         lastAction: "promote", 
         lastError: `Failed to promote: ${err}` 
       });
+      this.render();
       new Notice("Traveller Toolkit: Promote failed - see console for details");
     }
   }

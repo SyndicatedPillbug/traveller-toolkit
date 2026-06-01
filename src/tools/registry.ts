@@ -1,4 +1,4 @@
-import { TravellerToolkitPlugin } from "../app/TravellerToolkitPlugin";
+import TravellerToolkitPlugin from "../app/TravellerToolkitPlugin";
 import { ToolDefinition, TravellerTool } from "../app/types";
 
 export class ToolRegistry {
