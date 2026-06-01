@@ -1,11 +1,10 @@
+import { setIcon, Notice, TFile } from "obsidian";
 import { TravellerTool } from "../registry";
-import { TravellerToolkitPlugin } from "../../app/TravellerToolkitPlugin";
+import TravellerToolkitPlugin from "../../app/TravellerToolkitPlugin";
 import { TravellerToolkitServices } from "../../vault/services";
 import { TravellerToolkitSettingsManager } from "../../app/settings";
 import { LoadedSystem, SystemStatus } from "../../app/types";
 import { SUPPORT_NOTES } from "../../app/constants";
-import { Notice } from "obsidian";
-import { TFile } from "obsidian";
 
 /**
  * SystemGeneratorTool - Minimal vertical slice implementation
@@ -607,30 +606,28 @@ New Traveller system.
         }
       );
       
-      // Create missing support notes
-      if (settings.createSupportNotesOnPromote) {
-        for (const [id, path] of Object.entries(this.loadedSystem.supportPaths)) {
-          const { wasCreated } = await this.services.safeWrite.createFileIfMissing(
-            path,
-            this.getDefaultSupportContent(id)
-          );
-          if (wasCreated) {
-            console.log(`[Traveller Toolkit] Created ${path}`);
-            this.status.supportTargets[id] = true;
-          }
+      // Create missing support notes - ALWAYS create missing ones
+      // Existing notes are preserved (createFileIfMissing won't overwrite)
+      for (const [id, path] of Object.entries(this.loadedSystem.supportPaths)) {
+        const { wasCreated } = await this.services.safeWrite.createFileIfMissing(
+          path,
+          this.getDefaultSupportContent(id)
+        );
+        if (wasCreated) {
+          console.log(`[Traveller Toolkit] Created ${path}`);
+          this.status.supportTargets[id] = true;
         }
       }
       
-      // Create mainworld if needed
-      if (settings.createMainworldOnPromote) {
-        const { wasCreated } = await this.services.safeWrite.createFileIfMissing(
-          this.loadedSystem.mainworldPath,
-          this.getDefaultMainworldContent()
-        );
-        if (wasCreated) {
-          console.log(`[Traveller Toolkit] Created ${this.loadedSystem.mainworldPath}`);
-          this.status.mainworldExists = true;
-        }
+      // Create mainworld if missing - ALWAYS create if missing
+      // Existing mainworld is preserved (createFileIfMissing won't overwrite)
+      const { wasCreated } = await this.services.safeWrite.createFileIfMissing(
+        this.loadedSystem.mainworldPath,
+        this.getDefaultMainworldContent()
+      );
+      if (wasCreated) {
+        console.log(`[Traveller Toolkit] Created ${this.loadedSystem.mainworldPath}`);
+        this.status.mainworldExists = true;
       }
       
       this.status.mode = "promoted";

@@ -1,5 +1,6 @@
+import { setIcon } from "obsidian";
 import { TravellerTool } from "../registry";
-import { TravellerToolkitPlugin } from "../../app/TravellerToolkitPlugin";
+import TravellerToolkitPlugin from "../../app/TravellerToolkitPlugin";
 
 export class HomeTool implements TravellerTool {
   id: string = "home";
@@ -47,7 +48,7 @@ export class HomeTool implements TravellerTool {
       const card = grid.createDiv({ cls: `ttk-home-card ttk-home-card-${tool.status}` });
       
       const icon = card.createDiv({ cls: "ttk-home-card-icon" });
-      icon.createEl("span", { text: tool.icon });
+      setIcon(icon, tool.icon);
       
       const header = card.createDiv({ cls: "ttk-home-card-header" });
       header.createEl("h3", { text: tool.label });

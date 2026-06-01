@@ -1,7 +1,8 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { setIcon, ItemView, WorkspaceLeaf } from "obsidian";
 import { VIEW_TYPE_TRAVELLER_TOOLKIT } from "./viewTypes";
-import { TravellerToolkitPlugin } from "../app/TravellerToolkitPlugin";
+import TravellerToolkitPlugin from "../app/TravellerToolkitPlugin";
 import { HomeTool } from "../tools/home/HomeTool";
+import { SystemGeneratorTool } from "../tools/system-generator/SystemGeneratorTool";
 
 export class ToolkitView extends ItemView {
   plugin: TravellerToolkitPlugin;
@@ -70,7 +71,8 @@ export class ToolkitView extends ItemView {
         text: tool.label,
         cls: "ttk-nav-button",
       });
-      button.createEl("span", { cls: "ttk-nav-icon", text: tool.icon });
+      const icon = button.createSpan({ cls: "ttk-nav-icon" });
+      setIcon(icon, tool.icon);
       button.addEventListener("click", () => this.switchTool(tool.id));
     });
   }
