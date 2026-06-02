@@ -5,7 +5,7 @@ import { TravellerToolkitServices } from "../../vault/services";
 import { TravellerToolkitSettingsManager } from "../../app/settings";
 import { LoadedSystem, SystemStatus } from "../../app/types";
 import { SUPPORT_NOTES } from "../../app/constants";
-import { contextFromLoadedSystem } from "../../templates/core/templateTypes";
+import { contextFromLoadedSystem, TravellerTemplateContext } from "../../templates/core/templateTypes";
 import { buildMainworldNote } from "../../templates/core/mainworldTemplate";
 import { buildSystemNote } from "../../templates/core/systemTemplate";
 import { buildSupportNote } from "../../templates/support/supportTemplates";
@@ -201,7 +201,7 @@ export class SystemGeneratorTool implements TravellerTool {
       promoteSection.createEl("h3", { text: "Promote System" });
       
       const promoteButton = promoteSection.createEl("button", {
-        text: "Promote Loaded System",
+        text: "Promote Loaded System — Create Missing Notes Only",
         cls: "ttk-button ttk-button-primary ttk-button-promote",
       });
       promoteButton.addEventListener("click", async () => {
@@ -409,9 +409,63 @@ export class SystemGeneratorTool implements TravellerTool {
       // Create folder
       await this.services.vault.ensureFolder(folderPath);
       
-      // Create system note
-      const systemContent = this.getDefaultSystemContent(normalizedHex, name);
-      const systemFile = await this.services.vault.createFile(systemNotePath, systemContent);
+      // Create system note using template
+      const ctx: TravellerTemplateContext = {
+        loadedSystem: null,
+        hex: normalizedHex,
+        name: normalizeSystemName(name),
+        systemName: `${normalizeSystemName(name)} System`,
+        systemFolder: folderPath,
+        systemNotePath: systemNotePath,
+        mainworldPath: mainworldPath,
+        supportPaths: supportPaths,
+        date: new Date().toISOString().slice(0, 10),
+        uwp: "X000000-0",
+        starport: "X",
+        size: 0,
+        atmosphere: 0,
+        hydrographics: 0,
+        population: 0,
+        government: 0,
+        lawLevel: 0,
+        techLevel: 0,
+        tradeCodes: [],
+        bases: [],
+        baseCodes: [],
+        allegiance: "Independent",
+        allegianceCode: "In",
+        travelZone: "Green",
+        pbg: "000",
+        populationMultiplier: 0,
+        belts: 0,
+        gasGiants: 0,
+        stellarData: "",
+        worldCount: 1,
+        refinedFuel: false,
+        unrefinedFuel: false,
+        wildernessRefuelling: false,
+        fuelSources: [],
+        routeSecurity: "Unknown",
+        fuelReliability: "Unknown",
+        repairCapacity: "Unknown",
+        salvageRating: "Unknown",
+        industrialDecay: "Unknown",
+        laborUnrest: "Unknown",
+        militiaStrength: "Unknown",
+        blackMarketPresence: "Unknown",
+        collapseRisk: "Unknown",
+        autocracyPressure: "Unknown",
+        xboatRoute: false,
+        tradeRoute: false,
+        patrolRoute: false,
+        linkedRoutes: [],
+        linkedConflicts: [],
+        linkedRuins: [],
+        controllingFactions: [],
+        localRivals: [],
+        metadata: {},
+      };
+      const systemFile = await this.services.vault.createFile(systemNotePath, buildSystemNote(ctx));
       
       // Create LoadedSystem
       const supportPaths: Record<string, string> = {};
@@ -471,29 +525,6 @@ export class SystemGeneratorTool implements TravellerTool {
   
   /**
    * Get default content for new system note
-   */
-  private getDefaultSystemContent(hex: string, name: string): string {
-    return `---
-type: system
-hex: "${hex}"
-name: "${name}"
-mainworld: "${normalizeSystemName(name)}"
-status: draft
-prep_status: draft
----
-
-# ${name} System
-
-*Hex: ${hex}*
-
-## Overview
-
-New Traveller system.
-`;
-  }
-  
-  // ========================================================================
-  // LOAD SYSTEM
   // ========================================================================
   /**
    * Load a system by hex code
@@ -704,10 +735,11 @@ New Traveller system.
       
       // Create missing support notes - ALWAYS create missing ones
       // Existing notes are preserved (createFileIfMissing won't overwrite)
+      const context = contextFromLoadedSystem(this.loadedSystem);
       for (const [id, path] of Object.entries(this.loadedSystem.supportPaths)) {
         const { wasCreated } = await this.services.safeWrite.createFileIfMissing(
           path,
-          this.getDefaultSupportContent(id)
+          buildSupportNote(id, context)
         );
 
         if (wasCreated) {
@@ -723,7 +755,7 @@ New Traveller system.
       // Existing mainworld is preserved (createFileIfMissing won't overwrite)
       const { wasCreated: mainworldWasCreated } = await this.services.safeWrite.createFileIfMissing(
         this.loadedSystem.mainworldPath,
-        this.getDefaultMainworldContent()
+        buildMainworldNote(context)
       );
 
       if (mainworldWasCreated) {
@@ -753,25 +785,6 @@ New Traveller system.
   
   /**
    * Get default content for a support note
-   */
-  private getDefaultSupportContent(noteId: string): string {
-    const titles: Record<string, string> = {
-      npcs: "NPCs",
-      factions: "Factions",
-      rumors: "Rumors",
-      traffic: "Ships and Traffic",
-      sessions: "Sessions",
-    };
-    return `# ${titles[noteId] || noteId}\n\n`;
-  }
-  
-  /**
-   * Get default content for mainworld note
-   */
-  private getDefaultMainworldContent(): string {
-    return `# ${this.loadedSystem?.name || "Mainworld"}\n\n`;
-  }
-  
   /**
    * Update status and trigger re-render
    */

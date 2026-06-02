@@ -54,7 +54,7 @@ updated: ${ctx.date}
 
 ## Map Line
 
-`${ctx.hex} ${ctx.name} ${ctx.uwp} ${ctx.bases.join("/") || "-"} ${ctx.tradeCodes.join(" ") || "-"} ${ctx.travelZone} ${ctx.pbg} ${ctx.allegianceCode} ${ctx.stellarData}`
+\`${ctx.hex} ${ctx.name} ${ctx.uwp} ${ctx.bases.join("/") || "-"} ${ctx.tradeCodes.join(" ") || "-"} ${ctx.travelZone} ${ctx.pbg} ${ctx.allegianceCode} ${ctx.stellarData}\`
 
 ${uwpReference(ctx)}
 
