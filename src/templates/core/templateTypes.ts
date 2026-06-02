@@ -1,7 +1,7 @@
-import { LoadedSystem } from "../../../app/types";
+import { LoadedSystem } from "../../app/types";
 
 export interface TravellerTemplateContext {
-  loadedSystem: LoadedSystem;
+  loadedSystem: LoadedSystem | null;
   hex: string;
   name: string;
   systemName: string;
@@ -58,6 +58,17 @@ export interface TravellerTemplateContext {
   linkedRuins: string[];
   controllingFactions: string[];
   localRivals: string[];
+
+  // Dossier options
+  dossierStyle: string;
+  dossierComplexity: string;
+  dossierDensity: number;
+
+  // Generation direction sliders
+  frontierCore: number;
+  dangerLevel: number;
+  corporateInfluence: number;
+  weirdnessLevel: number;
 
   dossierMarkdown?: string;
   metadata: Record<string, unknown>;
@@ -196,6 +207,17 @@ export function contextFromLoadedSystem(loadedSystem: LoadedSystem): TravellerTe
     linkedRuins: readArray(meta, ["linked_ruins"], []),
     controllingFactions: readArray(meta, ["controlling_factions"], []),
     localRivals: readArray(meta, ["local_rivals"], []),
+
+    // Dossier options
+    dossierStyle: readString(meta, ["dossier_style"], "Balanced"),
+    dossierComplexity: readString(meta, ["dossier_complexity"], "Layered"),
+    dossierDensity: readNumber(meta, ["dossier_density"], 3),
+
+    // Generation direction sliders
+    frontierCore: readNumber(meta, ["frontier_core"], 35),
+    dangerLevel: readNumber(meta, ["danger_level"], 25),
+    corporateInfluence: readNumber(meta, ["corporate_influence"], 25),
+    weirdnessLevel: readNumber(meta, ["weirdness_level"], 15),
 
     metadata: meta,
   };

@@ -88,16 +88,18 @@ export class FrontmatterService {
       const match = trimmed.match(/^([\w-]+):\s*(.*)$/);
       if (match) {
         const key = match[1];
-        let value: unknown = match[2].trim();
+        let value: unknown = match[2]?.trim() || "";
         
         // Handle different types
-        if (value === "true" || value === "True") value = true;
-        else if (value === "false" || value === "False") value = false;
-        else if (value === "null" || value === "Null") value = null;
-        else if (!isNaN(Number(value))) value = Number(value);
-        else if (value.startsWith("[") && value.endsWith("]")) {
-          // Simple array parsing
-          value = value.slice(1, -1).split(",").map((v: string) => v.trim());
+        if (typeof value === "string") {
+          if (value === "true" || value === "True") value = true;
+          else if (value === "false" || value === "False") value = false;
+          else if (value === "null" || value === "Null") value = null;
+          else if (!isNaN(Number(value))) value = Number(value);
+          else if (value.startsWith("[") && value.endsWith("]")) {
+            // Simple array parsing
+            value = value.slice(1, -1).split(",").map((v: string) => v.trim());
+          }
         }
         
         result[key] = value;

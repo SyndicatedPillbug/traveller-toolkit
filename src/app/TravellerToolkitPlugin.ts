@@ -1,4 +1,4 @@
-import { Plugin, Notice } from "obsidian";
+import { Plugin, Notice, WorkspaceLeaf } from "obsidian";
 import { VIEW_TYPE_TRAVELLER_TOOLKIT } from "../views/viewTypes";
 import { TravellerToolkitSettingsManager } from "./settings";
 import { ToolkitView } from "../views/ToolkitView";
@@ -67,7 +67,7 @@ export default class TravellerToolkitPlugin extends Plugin {
 
   async activateView(data?: any) {
     const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_TRAVELLER_TOOLKIT);
-    let leaf = leaves[0];
+    let leaf: WorkspaceLeaf | null = leaves[0];
 
     if (!leaf) {
       leaf = this.app.workspace.getRightLeaf(false);

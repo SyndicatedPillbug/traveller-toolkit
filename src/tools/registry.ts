@@ -1,6 +1,8 @@
 import TravellerToolkitPlugin from "../app/TravellerToolkitPlugin";
 import { ToolDefinition, TravellerTool } from "../app/types";
 
+export type { TravellerTool };
+
 export class ToolRegistry {
   private plugin: TravellerToolkitPlugin;
   private services: any;

@@ -28,7 +28,7 @@ export class ToolkitView extends ItemView {
   }
 
   async onOpen() {
-    const container = this.containerEl.children[1];
+    const container = this.containerEl.children[1] as HTMLElement;
     container.empty();
     container.addClass("ttk-root");
 
@@ -83,8 +83,8 @@ export class ToolkitView extends ItemView {
       this.currentTool.onUnload();
     }
 
-    const container = this.containerEl.children[1];
-    const contentArea = container.querySelector(".ttk-content") ||
+    const container = this.containerEl.children[1] as HTMLElement;
+    const contentArea = container.querySelector(".ttk-content") as HTMLElement ||
       container.createDiv({ cls: "ttk-content" });
     contentArea.empty();
 
