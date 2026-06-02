@@ -5,6 +5,10 @@ import { TravellerToolkitServices } from "../../vault/services";
 import { TravellerToolkitSettingsManager } from "../../app/settings";
 import { LoadedSystem, SystemStatus } from "../../app/types";
 import { SUPPORT_NOTES } from "../../app/constants";
+import { contextFromLoadedSystem } from "../../templates/core/templateTypes";
+import { buildMainworldNote } from "../../templates/core/mainworldTemplate";
+import { buildSystemNote } from "../../templates/core/systemTemplate";
+import { buildSupportNote } from "../../templates/support/supportTemplates";
 
 // ==========================================================================
 // Helper functions
