@@ -74,6 +74,35 @@ export class SystemGeneratorTool implements TravellerTool {
   // UI elements for persistence across re-renders
   private hexInput: HTMLInputElement | null = null;
   private nameInput: HTMLInputElement | null = null;
+  private starportSelect: HTMLSelectElement | null = null;
+  private sizeSelect: HTMLSelectElement | null = null;
+  private atmosphereSelect: HTMLSelectElement | null = null;
+  private hydroSelect: HTMLSelectElement | null = null;
+  private popSelect: HTMLSelectElement | null = null;
+  private govSelect: HTMLSelectElement | null = null;
+  private lawSelect: HTMLSelectElement | null = null;
+  private tlSelect: HTMLSelectElement | null = null;
+  private pbgInput: HTMLInputElement | null = null;
+  private popMultInput: HTMLInputElement | null = null;
+  private beltsInput: HTMLInputElement | null = null;
+  private ggInput: HTMLInputElement | null = null;
+  private stellarInput: HTMLInputElement | null = null;
+  private worldCountInput: HTMLInputElement | null = null;
+  private refinedCheckbox: HTMLInputElement | null = null;
+  private unrefinedCheckbox: HTMLInputElement | null = null;
+  private wildCheckbox: HTMLInputElement | null = null;
+  private sourcesInput: HTMLInputElement | null = null;
+  private xboatCheckbox: HTMLInputElement | null = null;
+  private tradeCheckbox: HTMLInputElement | null = null;
+  private patrolCheckbox: HTMLInputElement | null = null;
+  private navalCheckbox: HTMLInputElement | null = null;
+  private scoutCheckbox: HTMLInputElement | null = null;
+  private researchCheckbox: HTMLInputElement | null = null;
+  private corpCheckbox: HTMLInputElement | null = null;
+  private milCheckbox: HTMLInputElement | null = null;
+  private styleSelect: HTMLSelectElement | null = null;
+  private complexitySelect: HTMLSelectElement | null = null;
+  private densitySelect: HTMLSelectElement | null = null;
   
   constructor(
     private plugin: TravellerToolkitPlugin,
@@ -130,6 +159,364 @@ export class SystemGeneratorTool implements TravellerTool {
       },
     }) as HTMLInputElement;
     this.nameInput = nameInputEl;
+    
+    // ======================================================================
+    // GENERATION DIRECTION SLIDERS
+    // ======================================================================
+    const slidersSection = createSection.createDiv({ cls: "ttk-section ttk-sliders-section" });
+    slidersSection.createEl("h4", { text: "Generation Direction" });
+    
+    // Frontier/Core slider
+    const frontierRow = slidersSection.createDiv({ cls: "ttk-row ttk-slider-row" });
+    frontierRow.createEl("label", { text: "Frontier ←→ Core", cls: "ttk-label" });
+    const frontierSlider = frontierRow.createEl("input", {
+      type: "range",
+      cls: "ttk-slider",
+      attr: { min: "0", max: "10", value: "5", step: "1" }
+    }) as HTMLInputElement;
+    frontierRow.createEl("span", { text: "5", cls: "ttk-slider-value" });
+    
+    // Danger slider
+    const dangerRow = slidersSection.createDiv({ cls: "ttk-row ttk-slider-row" });
+    dangerRow.createEl("label", { text: "Safe ←→ Dangerous", cls: "ttk-label" });
+    const dangerSlider = dangerRow.createEl("input", {
+      type: "range",
+      cls: "ttk-slider",
+      attr: { min: "0", max: "10", value: "5", step: "1" }
+    }) as HTMLInputElement;
+    dangerRow.createEl("span", { text: "5", cls: "ttk-slider-value" });
+    
+    // Corporate slider
+    const corporateRow = slidersSection.createDiv({ cls: "ttk-row ttk-slider-row" });
+    corporateRow.createEl("label", { text: "Independent ←→ Corporate", cls: "ttk-label" });
+    const corporateSlider = corporateRow.createEl("input", {
+      type: "range",
+      cls: "ttk-slider",
+      attr: { min: "0", max: "10", value: "5", step: "1" }
+    }) as HTMLInputElement;
+    corporateRow.createEl("span", { text: "5", cls: "ttk-slider-value" });
+    
+    // Weirdness slider
+    const weirdnessRow = slidersSection.createDiv({ cls: "ttk-row ttk-slider-row" });
+    weirdnessRow.createEl("label", { text: "Conventional ←→ Weird", cls: "ttk-label" });
+    const weirdnessSlider = weirdnessRow.createEl("input", {
+      type: "range",
+      cls: "ttk-slider",
+      attr: { min: "0", max: "10", value: "5", step: "1" }
+    }) as HTMLInputElement;
+    weirdnessRow.createEl("span", { text: "5", cls: "ttk-slider-value" });
+    
+    // ======================================================================
+    // MAINWORLD UWP FIELDS
+    // ======================================================================
+    const uwpsSection = createSection.createDiv({ cls: "ttk-section ttk-uwp-section" });
+    uwpsSection.createEl("h4", { text: "Mainworld UWP" });
+    
+    // Starport
+    const starportRow = uwpsSection.createDiv({ cls: "ttk-row" });
+    starportRow.createEl("label", { text: "Starport: ", cls: "ttk-label" });
+    this.starportSelect = starportRow.createEl("select", {
+      cls: "ttk-select"
+    }) as HTMLSelectElement;
+    ["X", "E", "D", "C", "B", "A"].forEach(opt => {
+      starportSelectEl.createEl("option", { text: opt, value: opt });
+    });
+    starportSelectEl.value = "C";
+    
+    // Size
+    const sizeRow = uwpsSection.createDiv({ cls: "ttk-row" });
+    sizeRow.createEl("label", { text: "Size: ", cls: "ttk-label" });
+    const sizeSelectEl = sizeRow.createEl("select", {
+      cls: "ttk-select"
+    }) as HTMLSelectElement;
+    for (let i = 0; i <= 15; i++) {
+      sizeSelectEl.createEl("option", { text: String(i), value: String(i) });
+    }
+    sizeSelectEl.value = "7";
+    
+    // Atmosphere
+    const atmRow = uwpsSection.createDiv({ cls: "ttk-row" });
+    atmRow.createEl("label", { text: "Atmosphere: ", cls: "ttk-label" });
+    const atmSelectEl = atmRow.createEl("select", {
+      cls: "ttk-select"
+    }) as HTMLSelectElement;
+    for (let i = 0; i <= 15; i++) {
+      atmSelectEl.createEl("option", { text: String(i), value: String(i) });
+    }
+    atmSelectEl.value = "6";
+    
+    // Hydrographics
+    const hydroRow = uwpsSection.createDiv({ cls: "ttk-row" });
+    hydroRow.createEl("label", { text: "Hydro: ", cls: "ttk-label" });
+    const hydroSelectEl = hydroRow.createEl("select", {
+      cls: "ttk-select"
+    }) as HTMLSelectElement;
+    for (let i = 0; i <= 10; i++) {
+      hydroSelectEl.createEl("option", { text: String(i), value: String(i) });
+    }
+    hydroSelectEl.value = "7";
+    
+    // Population
+    const popRow = uwpsSection.createDiv({ cls: "ttk-row" });
+    popRow.createEl("label", { text: "Population: ", cls: "ttk-label" });
+    const popSelectEl = popRow.createEl("select", {
+      cls: "ttk-select"
+    }) as HTMLSelectElement;
+    for (let i = 0; i <= 15; i++) {
+      popSelectEl.createEl("option", { text: String(i), value: String(i) });
+    }
+    popSelectEl.value = "6";
+    
+    // Government
+    const govRow = uwpsSection.createDiv({ cls: "ttk-row" });
+    govRow.createEl("label", { text: "Government: ", cls: "ttk-label" });
+    const govSelectEl = govRow.createEl("select", {
+      cls: "ttk-select"
+    }) as HTMLSelectElement;
+    for (let i = 0; i <= 15; i++) {
+      govSelectEl.createEl("option", { text: String(i), value: String(i) });
+    }
+    govSelectEl.value = "4";
+    
+    // Law Level
+    const lawRow = uwpsSection.createDiv({ cls: "ttk-row" });
+    lawRow.createEl("label", { text: "Law: ", cls: "ttk-label" });
+    const lawSelectEl = lawRow.createEl("select", {
+      cls: "ttk-select"
+    }) as HTMLSelectElement;
+    for (let i = 0; i <= 15; i++) {
+      lawSelectEl.createEl("option", { text: String(i), value: String(i) });
+    }
+    lawSelectEl.value = "5";
+    
+    // Tech Level
+    const tlRow = uwpsSection.createDiv({ cls: "ttk-row" });
+    tlRow.createEl("label", { text: "TL: ", cls: "ttk-label" });
+    const tlSelectEl = tlRow.createEl("select", {
+      cls: "ttk-select"
+    }) as HTMLSelectElement;
+    for (let i = 0; i <= 15; i++) {
+      tlSelectEl.createEl("option", { text: String(i), value: String(i) });
+    }
+    tlSelectEl.value = "8";
+    
+    // UWP Display
+    const uwpsDisplayRow = uwpsSection.createDiv({ cls: "ttk-row" });
+    uwpsDisplayRow.createEl("label", { text: "UWP: ", cls: "ttk-label" });
+    const uwpsDisplay = uwpsDisplayRow.createEl("span", {
+      cls: "ttk-uwp-display"
+    });
+    uwpsDisplay.setText("C767645-8");
+    
+    // Update UWP display when selects change
+    const updateUWP = () => {
+      const uwp = `${starportSelectEl.value}${sizeSelectEl.value}${atmSelectEl.value}${hydroSelectEl.value}${popSelectEl.value}${govSelectEl.value}${lawSelectEl.value}-${tlSelectEl.value}`;
+      uwpsDisplay.setText(uwp);
+    };
+    starportSelectEl.addEventListener("change", updateUWP);
+    sizeSelectEl.addEventListener("change", updateUWP);
+    atmSelectEl.addEventListener("change", updateUWP);
+    hydroSelectEl.addEventListener("change", updateUWP);
+    popSelectEl.addEventListener("change", updateUWP);
+    govSelectEl.addEventListener("change", updateUWP);
+    lawSelectEl.addEventListener("change", updateUWP);
+    tlSelectEl.addEventListener("change", updateUWP);
+    
+    // ======================================================================
+    // MAP METADATA
+    // ======================================================================
+    const mapSection = createSection.createDiv({ cls: "ttk-section ttk-map-section" });
+    mapSection.createEl("h4", { text: "Map Metadata" });
+    
+    // PBG
+    const pbgRow = mapSection.createDiv({ cls: "ttk-row" });
+    pbgRow.createEl("label", { text: "PBG: ", cls: "ttk-label" });
+    const pbgInput = pbgRow.createEl("input", {
+      type: "text",
+      cls: "ttk-input ttk-input-short",
+      attr: { placeholder: "101", maxlength: "3" }
+    }) as HTMLInputElement;
+    pbgInput.value = "101";
+    
+    // Pop Multiplier
+    const popMultRow = mapSection.createDiv({ cls: "ttk-row" });
+    popMultRow.createEl("label", { text: "Pop Mult: ", cls: "ttk-label" });
+    const popMultInput = popMultRow.createEl("input", {
+      type: "number",
+      cls: "ttk-input ttk-input-short",
+      attr: { placeholder: "0", min: "0" }
+    }) as HTMLInputElement;
+    popMultInput.value = "0";
+    
+    // Belts
+    const beltsRow = mapSection.createDiv({ cls: "ttk-row" });
+    beltsRow.createEl("label", { text: "Belts: ", cls: "ttk-label" });
+    const beltsInput = beltsRow.createEl("input", {
+      type: "number",
+      cls: "ttk-input ttk-input-short",
+      attr: { placeholder: "0", min: "0" }
+    }) as HTMLInputElement;
+    beltsInput.value = "0";
+    
+    // Gas Giants
+    const ggRow = mapSection.createDiv({ cls: "ttk-row" });
+    ggRow.createEl("label", { text: "Gas Giants: ", cls: "ttk-label" });
+    const ggInput = ggRow.createEl("input", {
+      type: "number",
+      cls: "ttk-input ttk-input-short",
+      attr: { placeholder: "1", min: "0" }
+    }) as HTMLInputElement;
+    ggInput.value = "1";
+    
+    // Stellar
+    const stellarRow = mapSection.createDiv({ cls: "ttk-row" });
+    stellarRow.createEl("label", { text: "Stellar: ", cls: "ttk-label" });
+    const stellarInput = stellarRow.createEl("input", {
+      type: "text",
+      cls: "ttk-input",
+      attr: { placeholder: "G2 V" }
+    }) as HTMLInputElement;
+    stellarInput.value = "G2 V";
+    
+    // World Count
+    const worldCountRow = mapSection.createDiv({ cls: "ttk-row" });
+    worldCountRow.createEl("label", { text: "Worlds: ", cls: "ttk-label" });
+    const worldCountInput = worldCountRow.createEl("input", {
+      type: "number",
+      cls: "ttk-input ttk-input-short",
+      attr: { placeholder: "1", min: "1" }
+    }) as HTMLInputElement;
+    worldCountInput.value = "1";
+    
+    // ======================================================================
+    // FUEL/ROUTES
+    // ======================================================================
+    const fuelSection = createSection.createDiv({ cls: "ttk-section ttk-fuel-section" });
+    fuelSection.createEl("h4", { text: "Fuel, Port, Routes" });
+    
+    // Refined Fuel
+    const refinedRow = fuelSection.createDiv({ cls: "ttk-row" });
+    refinedRow.createEl("label", { text: "Refined Fuel: ", cls: "ttk-label" });
+    const refinedCheckbox = refinedRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox"
+    }) as HTMLInputElement;
+    refinedCheckbox.checked = true;
+    
+    // Unrefined Fuel
+    const unrefinedRow = fuelSection.createDiv({ cls: "ttk-row" });
+    unrefinedRow.createEl("label", { text: "Unrefined Fuel: ", cls: "ttk-label" });
+    const unrefinedCheckbox = unrefinedRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox"
+    }) as HTMLInputElement;
+    
+    // Wilderness Refuelling
+    const wildRow = fuelSection.createDiv({ cls: "ttk-row" });
+    wildRow.createEl("label", { text: "Wilderness Refuelling: ", cls: "ttk-label" });
+    const wildCheckbox = wildRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox"
+    }) as HTMLInputElement;
+    
+    // Fuel Sources
+    const sourcesRow = fuelSection.createDiv({ cls: "ttk-row" });
+    sourcesRow.createEl("label", { text: "Fuel Sources: ", cls: "ttk-label" });
+    const sourcesInput = sourcesRow.createEl("input", {
+      type: "text",
+      cls: "ttk-input",
+      attr: { placeholder: "e.g., Water, Hydrogen" }
+    }) as HTMLInputElement;
+    
+    // Routes
+    const routesRow = fuelSection.createDiv({ cls: "ttk-row" });
+    routesRow.createEl("label", { text: "Routes: ", cls: "ttk-label" });
+    const xboatCheckbox = routesRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox",
+      attr: { id: "xboat" }
+    }) as HTMLInputElement;
+    routesRow.createEl("label", { text: "Xboat", cls: "ttk-checkbox-label", attr: { for: "xboat" } });
+    const tradeCheckbox = routesRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox",
+      attr: { id: "trade" }
+    }) as HTMLInputElement;
+    routesRow.createEl("label", { text: "Trade", cls: "ttk-checkbox-label", attr: { for: "trade" } });
+    const patrolCheckbox = routesRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox",
+      attr: { id: "patrol" }
+    }) as HTMLInputElement;
+    routesRow.createEl("label", { text: "Patrol", cls: "ttk-checkbox-label", attr: { for: "patrol" } });
+    
+    // ======================================================================
+    // BASES & SPECIAL FEATURES
+    // ======================================================================
+    const basesSection = createSection.createDiv({ cls: "ttk-section ttk-bases-section" });
+    basesSection.createEl("h4", { text: "Bases & Special Features" });
+    
+    const basesRow = basesSection.createDiv({ cls: "ttk-row" });
+    const navalCheckbox = basesRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox",
+      attr: { id: "naval" }
+    }) as HTMLInputElement;
+    basesRow.createEl("label", { text: "Naval", cls: "ttk-checkbox-label", attr: { for: "naval" } });
+    const scoutCheckbox = basesRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox",
+      attr: { id: "scout" }
+    }) as HTMLInputElement;
+    basesRow.createEl("label", { text: "Scout", cls: "ttk-checkbox-label", attr: { for: "scout" } });
+    const researchCheckbox = basesRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox",
+      attr: { id: "research" }
+    }) as HTMLInputElement;
+    basesRow.createEl("label", { text: "Research", cls: "ttk-checkbox-label", attr: { for: "research" } });
+    const corpCheckbox = basesRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox",
+      attr: { id: "corp" }
+    }) as HTMLInputElement;
+    basesRow.createEl("label", { text: "Corporate", cls: "ttk-checkbox-label", attr: { for: "corp" } });
+    const milCheckbox = basesRow.createEl("input", {
+      type: "checkbox",
+      cls: "ttk-checkbox",
+      attr: { id: "mil" }
+    }) as HTMLInputElement;
+    basesRow.createEl("label", { text: "Military", cls: "ttk-checkbox-label", attr: { for: "mil" } });
+    
+    // ======================================================================
+    // DOSSIER OPTIONS
+    // ======================================================================
+    const dossierSection = createSection.createDiv({ cls: "ttk-section ttk-dossier-section" });
+    dossierSection.createEl("h4", { text: "Dossier Options" });
+    
+    const styleRow = dossierSection.createDiv({ cls: "ttk-row" });
+    styleRow.createEl("label", { text: "Style: ", cls: "ttk-label" });
+    const styleSelect = styleRow.createEl("select", { cls: "ttk-select" }) as HTMLSelectElement;
+    ["Standard", "Detailed", "Concise", "Atmospheric"].forEach(opt => {
+      styleSelect.createEl("option", { text: opt, value: opt });
+    });
+    styleSelect.value = "Standard";
+    
+    const complexityRow = dossierSection.createDiv({ cls: "ttk-row" });
+    complexityRow.createEl("label", { text: "Complexity: ", cls: "ttk-label" });
+    const complexitySelect = complexityRow.createEl("select", { cls: "ttk-select" }) as HTMLSelectElement;
+    ["Low", "Moderate", "High", "Very High"].forEach(opt => {
+      complexitySelect.createEl("option", { text: opt, value: opt });
+    });
+    complexitySelect.value = "Moderate";
+    
+    const densityRow = dossierSection.createDiv({ cls: "ttk-row" });
+    densityRow.createEl("label", { text: "Density: ", cls: "ttk-label" });
+    const densitySelect = densityRow.createEl("select", { cls: "ttk-select" }) as HTMLSelectElement;
+    for (let i = 1; i <= 5; i++) {
+      densitySelect.createEl("option", { text: String(i), value: String(i) });
+    }
+    densitySelect.value = "3";
     
     // Create button
     const createButton = createSection.createEl("button", {
