@@ -207,6 +207,37 @@ export class SystemGeneratorTool implements TravellerTool {
       promoteButton.addEventListener("click", async () => {
         await this.promoteLoadedSystem();
       });
+      
+      // Promote Preview
+      const previewSection = promoteSection.createDiv({ cls: "ttk-promote-preview" });
+      previewSection.createEl("h4", { text: "Promote Preview" });
+      
+      const previewList = previewSection.createEl("ul", { cls: "ttk-promote-preview-list" });
+      
+      // Will preserve
+      const preserveLi = previewList.createEl("li", { cls: "ttk-promote-preview-item" });
+      preserveLi.createEl("span", { text: "Will preserve: ", cls: "ttk-promote-preview-label" });
+      const preserveUl = preserveLi.createEl("ul", { cls: "ttk-promote-preview-sublist" });
+      preserveUl.createEl("li", { text: "Existing mainworld note, if present" });
+      preserveUl.createEl("li", { text: "Existing support notes, if present" });
+      
+      // Will create if missing
+      const createLi = previewList.createEl("li", { cls: "ttk-promote-preview-item" });
+      createLi.createEl("span", { text: "Will create if missing: ", cls: "ttk-promote-preview-label" });
+      const createUl = createLi.createEl("ul", { cls: "ttk-promote-preview-sublist" });
+      createUl.createEl("li", { text: this.loadedSystem.mainworldPath });
+      for (const [id, path] of Object.entries(this.loadedSystem.supportPaths)) {
+        const noteName = SUPPORT_NOTES.find(n => n.id === id)?.label || id;
+        createUl.createEl("li", { text: `${noteName}: ${path}` });
+      }
+      
+      // Will update
+      const updateLi = previewList.createEl("li", { cls: "ttk-promote-preview-item" });
+      updateLi.createEl("span", { text: "Will update frontmatter on: ", cls: "ttk-promote-preview-label" });
+      updateLi.createEl("span", { text: this.loadedSystem.systemNotePath });
+      
+      const noteLi = previewList.createEl("li", { cls: "ttk-promote-preview-item ttk-promote-preview-note" });
+      noteLi.createEl("span", { text: "Existing notes will not be overwritten" });
     }
     
     // ========================================================================
