@@ -1,4 +1,4 @@
-import { LoadedSystem } from "../..//app/types";
+import { LoadedSystem } from "../../../app/types";
 
 export interface TravellerTemplateContext {
   loadedSystem: LoadedSystem;
